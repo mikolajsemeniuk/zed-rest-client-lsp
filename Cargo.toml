@@ -1,0 +1,17 @@
+[package]
+name = "zed-rest-client-lsp"
+version = "0.0.1"
+edition = "2021"
+description = "LSP server for the zed-rest-client extension — sends HTTP requests from .http/.rest files"
+license = "Apache-2.0"
+repository = "https://github.com/mikolajsemeniuk/zed-rest-client-lsp"
+
+[dependencies]
+tower-lsp = "0.20"
+tokio = { version = "1", features = ["io-std", "rt-multi-thread", "macros"] }
+serde_json = "1"
+reqwest = { version = "0.13", features = ["json"] }
+uuid = { version = "1", features = ["v4"] }
+chrono = "0.4"
+rand = "0.8"
+regex = "1"
