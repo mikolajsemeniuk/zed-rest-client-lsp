@@ -274,13 +274,13 @@ impl LanguageServer for Backend {
 
         let Some(uri_arg) = params.arguments.first() else {
             self.client
-                .show_message(MessageType::ERROR, "Brak uri w argumentach")
+                .show_message(MessageType::ERROR, "Missing uri in arguments")
                 .await;
             return Ok(None);
         };
         let Some(line_arg) = params.arguments.get(1) else {
             self.client
-                .show_message(MessageType::ERROR, "Brak line w argumentach")
+                .show_message(MessageType::ERROR, "Missing line in arguments")
                 .await;
             return Ok(None);
         };
@@ -290,7 +290,7 @@ impl LanguageServer for Backend {
 
         let Ok(uri) = Url::parse(&uri_str) else {
             self.client
-                .show_message(MessageType::ERROR, "Nieprawidłowe URI")
+                .show_message(MessageType::ERROR, "Invalid URI")
                 .await;
             return Ok(None);
         };
@@ -301,14 +301,14 @@ impl LanguageServer for Backend {
         };
         let Some(text) = text else {
             self.client
-                .show_message(MessageType::ERROR, "Dokument nie jest otwarty")
+                .show_message(MessageType::ERROR, "Document is not open")
                 .await;
             return Ok(None);
         };
 
         let Some(mut req) = parse_request_at(&text, line_idx) else {
             self.client
-                .show_message(MessageType::ERROR, "Nie udało się sparsować requestu")
+                .show_message(MessageType::ERROR, "Failed to parse request")
                 .await;
             return Ok(None);
         };
@@ -361,7 +361,7 @@ impl LanguageServer for Backend {
                 self.client
                     .show_message(
                         MessageType::ERROR,
-                        format!("Nieobsługiwana metoda: {other}"),
+                        format!("Unsupported method: {other}"),
                     )
                     .await;
                 return Ok(None);
@@ -411,7 +411,7 @@ impl LanguageServer for Backend {
                 Ok(t) => t,
                 Err(e) => {
                     self.client
-                        .show_message(MessageType::ERROR, format!("zapis do tmp poległ: {e}"))
+                        .show_message(MessageType::ERROR, format!("failed to write response to tmp: {e}"))
                         .await;
                     return Ok(Some(serde_json::json!({ "ok": true, "saved_file": false })));
                 }
@@ -424,7 +424,7 @@ impl LanguageServer for Backend {
             self.client
                 .show_message(
                     MessageType::ERROR,
-                    format!("nie udało się odpalić `zed` CLI: {e}. Sprawdź czy CLI jest zainstalowane (cmd+shift+p → cli: install)"),
+                    format!("failed to launch `zed` CLI: {e}. Make sure the CLI is installed (cmd+shift+p → cli: install)"),
                 )
                 .await;
         }

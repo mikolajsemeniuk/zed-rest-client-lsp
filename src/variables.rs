@@ -83,17 +83,17 @@ fn resolve_system_var(name: &str, args: &str) -> Result<String, String> {
             let parts: Vec<&str> = args.split_whitespace().collect();
             if parts.len() != 2 {
                 return Err(format!(
-                    "$randomInt wymaga 2 argumentów (min max), dostałem: '{args}'"
+                    "$randomInt requires 2 arguments (min max), got: '{args}'"
                 ));
             }
             let min: i64 = parts[0]
                 .parse()
-                .map_err(|_| format!("$randomInt: '{}' nie jest liczbą", parts[0]))?;
+                .map_err(|_| format!("$randomInt: '{}' is not a number", parts[0]))?;
             let max: i64 = parts[1]
                 .parse()
-                .map_err(|_| format!("$randomInt: '{}' nie jest liczbą", parts[1]))?;
+                .map_err(|_| format!("$randomInt: '{}' is not a number", parts[1]))?;
             if min >= max {
-                return Err(format!("$randomInt: min ({min}) musi być < max ({max})"));
+                return Err(format!("$randomInt: min ({min}) must be < max ({max})"));
             }
             let mut rng = rand::thread_rng();
             Ok(rng.gen_range(min..max).to_string())
@@ -102,24 +102,24 @@ fn resolve_system_var(name: &str, args: &str) -> Result<String, String> {
         "processEnv" => {
             let var_name = args.trim();
             if var_name.is_empty() {
-                return Err("$processEnv wymaga nazwy zmiennej".to_string());
+                return Err("$processEnv requires a variable name".to_string());
             }
             std::env::var(var_name)
-                .map_err(|_| format!("$processEnv: zmienna '{var_name}' nie jest ustawiona"))
+                .map_err(|_| format!("$processEnv: variable '{var_name}' is not set"))
         }
 
-        other => Err(format!("nieznana system variable: ${other}")),
+        other => Err(format!("unknown system variable: ${other}")),
     }
 }
 
 fn apply_offset(base: chrono::DateTime<Utc>, args: &str) -> Result<chrono::DateTime<Utc>, String> {
     let parts: Vec<&str> = args.split_whitespace().collect();
     if parts.len() != 2 {
-        return Err(format!("offset wymaga 'N unit', dostałem: '{args}'"));
+        return Err(format!("offset requires 'N unit', got: '{args}'"));
     }
     let n: i64 = parts[0]
         .parse()
-        .map_err(|_| format!("offset: '{}' nie jest liczbą", parts[0]))?;
+        .map_err(|_| format!("offset: '{}' is not a number", parts[0]))?;
     let unit = parts[1];
     let duration = match unit {
         "s" => Duration::seconds(n),
@@ -130,7 +130,7 @@ fn apply_offset(base: chrono::DateTime<Utc>, args: &str) -> Result<chrono::DateT
         "y" => Duration::days(n * 365),
         other => {
             return Err(format!(
-                "nieznana jednostka offsetu: '{other}' (oczekiwane: s/m/h/d/w/y)"
+                "unknown offset unit: '{other}' (expected: s/m/h/d/w/y)"
             ))
         }
     };
@@ -175,7 +175,7 @@ pub fn substitute_all(input: &str, file_vars: &HashMap<String, String>) -> Resul
 
     let unresolved_re = Regex::new(r"\{\{\s*([^$\s\}][^}]*?)\s*\}\}").unwrap();
     if let Some(caps) = unresolved_re.captures(&after_user) {
-        return Err(format!("nieznana zmienna: {{{{{}}}}}", caps[1].trim()));
+        return Err(format!("unknown variable: {{{{{}}}}}", caps[1].trim()));
     }
 
     substitute_system_vars(&after_user)
